@@ -1,7 +1,0 @@
-hzd:
-	gcc hzd_main.c 485communication.c  485communication.h metering.c -o hzd -lpthread
-
-
-clean:
-	rm hzd
-
