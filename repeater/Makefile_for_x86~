@@ -1,0 +1,12 @@
+hzd:hzd_main.o 485communication.o
+	gcc hzd_main.o 485communication.o -o hzd
+
+hzd_main.o:hzd_main.c 485communication.h
+	gcc -c hzd_main.c
+
+485communication.o:485communication.c 485communication.h
+	gcc -c 485communication.c
+
+clean:
+	rm hzd
+

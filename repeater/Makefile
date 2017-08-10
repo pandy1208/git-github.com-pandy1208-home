@@ -1,0 +1,8 @@
+hzd:
+	arm-linux-gnueabihf-gcc hzd_main.c 485communication.c 485communication.h metering.c task_slave485.c crc.c socket.c aes.c task_tcp_identify.c task_tcp_heart_beat.c md5.c -o hzd -lpthread
+	arm-linux-gnueabihf-gcc console.c -o console -lpthread
+
+clean:
+	rm hzd
+	rm console
+
