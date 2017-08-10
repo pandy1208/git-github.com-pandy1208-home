@@ -1,0 +1,231 @@
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
+#include <string.h>
+#include <pthread.h>
+#include <sys/time.h>
+#include <malloc.h>
+#include <sys/msg.h>
+#include "485communication.h"
+
+#define BUFFER_SIZE 1500
+#define MSG_MASTER485 0x01
+#define MSG_SLAVE485 0x02
+#define MSG_SEQUENCE 0X10
+#define MSG_RESULT 0X11
+#define MSG_HEART_RESULT 0X12
+#define MSG_SERVER_CTRL 0X13
+#define MSG_TIMESTAMP_CAL 0X14
+#define MSG_SYSTEM_CFG 0X15
+#define MSG_INIT_VAL 0X16
+#define MSG_HEATPUMP 0X17
+#define MSG_OUTPUT 0X20
+#define TIMEOUT	0x30
+#define PASS 0x01
+#define NOPASS 0x00
+
+
+extern int rtc_fd;
+
+int set_opt(int fd,int nSpeed,char nEvent){
+	struct termios newtio;
+	if (tcgetattr(fd,&newtio) != 0){
+		perror("SetupSerial 1");
+		return -1;
+	}
+
+
+	switch(nEvent){
+		case 'O':
+			newtio.c_cflag |= PARENB;
+			newtio.c_cflag |= PARODD;
+			newtio.c_iflag |= (INPCK | ISTRIP);
+			break;
+		case 'E':
+			newtio.c_cflag |= PARENB;
+			newtio.c_cflag &= ~PARODD;
+			newtio.c_iflag |= (INPCK | ISTRIP);
+			break;
+		case 'N':
+			break;
+		default:
+			break;
+	}
+
+	switch(nSpeed){
+		case 2400:
+			cfsetispeed( &newtio, B2400 );
+			cfsetospeed( &newtio, B2400 );
+			break;
+		case 4800:
+			cfsetispeed( &newtio, B4800 );
+			cfsetospeed( &newtio, B4800 );
+			break;
+		case 9600:
+			cfsetispeed( &newtio, B9600 );
+			cfsetospeed( &newtio, B9600 );
+			break;
+		case 115200:
+			cfsetispeed( &newtio, B115200 );
+			cfsetospeed( &newtio, B115200 );
+			break;
+		default:
+			cfsetispeed( &newtio, B9600 );
+			cfsetospeed( &newtio, B9600 );
+			break;
+	}
+	
+	newtio.c_cc[VTIME] = 1;
+	newtio.c_cc[VMIN] = 128;
+
+	if (( tcsetattr(fd, TCSANOW,&newtio)) != 0){
+		perror("com set error");
+		return -1;
+	}
+	
+	return 0;
+
+}
+
+
+/*
+	函数名：int mater485_init
+	功能：设置主485口到相应的参数
+    返回：文件描述符fd
+*/
+int master485_init(void)
+{
+	int fd;
+	char *usart = "/dev/ttyUSB0";
+	struct termios newtio;
+
+	if ((fd = open(usart, O_RDWR,0777)) < 0 ){
+	printf("open %s failed!\n",usart);
+	}
+	else
+		printf("open %s success!\n",usart);
+
+	set_opt(fd,9600,'N');
+	printf("set master485 to 9600 N 1 success!\n");
+	
+	return fd;	
+}
+
+
+/*
+	函数名：int mater485_init
+	功能：设置从485口到相应的参数
+    返回：文件描述符fd
+*/
+int slave485_init(void)
+{
+	int fd;
+	char *usart = "/dev/ttyUSB1";
+	struct termios newtio;
+
+	if ((fd = open(usart, O_RDWR,0777)) < 0 ){
+	printf("open %s failed!\n",usart);
+	}
+	else
+		printf("open %s success!\n",usart);
+
+	set_opt(fd,9600,'N');
+	printf("set slave485 to 9600 N 1 success!\n");
+	
+	return fd;	
+}
+
+/*
+	函数名： 通过master485发送n个字符
+	参数：int fd 文件描述符，int n 要发送的字符个数，const char * data指向字符的指针。
+*/
+void master485_send_chars(int fd,int n,const char *data)
+{
+		write(fd,data,n);
+}
+
+
+/*
+函数：主485接收线程
+功能：接收主485上的现场仪表信息
+*/
+extern pthread_t master_thread;
+struct msgbuf msg_master;
+extern char msg_box,ctrl_com1_num;
+extern char i;
+char CatCtrlDate = 0,CatMasterDate = 0;
+void master_input_pthread(void)
+{
+	//printf("\r\nmaster_input_pthread\r\n");
+	msg_master.mtype = MSG_MASTER485;
+	msg_master.packet_type = MSG_MASTER485;
+	while(1)
+	{
+			memset(msg_master.mtext,0,sizeof(unsigned char)*MAST485_BUF_SIZE);
+			ctrl_com1_num = read(master485_fd,msg_master.mtext,MAST485_BUF_SIZE);
+			if(CatMasterDate){
+				printf("\r\nmaster rev:\r\n");
+				for(i = 0;i < ctrl_com1_num;i ++){
+					printf("%02x ",msg_master.mtext[i]);
+					}
+
+				write(rtc_fd, msg_master.mtext, ctrl_com1_num);
+
+				}
+			if( -1 == msgsnd(msg_box,&msg_master,MAST485_BUF_SIZE,0) )
+				printf("msgsed fail!\n");
+	}
+}
+
+/*
+函数：从485接收线程
+功能：接收从485上的触摸屏信息
+*/
+extern pthread_t slave_thread;
+struct msgbuf msg_slave;
+extern char msg_box;
+void slave_input_pthread(void)
+{
+	//printf("\r\nslave_input_pthread\r\n");
+	msg_slave.mtype = MSG_SLAVE485;
+	while(1)
+	{
+			memset(msg_slave.mtext,0,sizeof(unsigned char)*MAST485_BUF_SIZE);
+			//read(master485_fd,msg_slave,MAST485_BUF_SIZE);
+			ctrl_com1_num = read(slave485_fd,msg_slave.mtext,MAST485_BUF_SIZE);
+
+			if(CatCtrlDate){
+				printf("\r\nslave rev:\r\n");
+				for(i = 0;i < ctrl_com1_num;i ++){
+					printf("%02x ",msg_slave.mtext[i]);
+
+					}
+
+				write(rtc_fd, msg_slave.mtext, ctrl_com1_num);
+		
+				}
+			if( -1 == msgsnd(msg_box,&msg_slave,MAST485_BUF_SIZE,0) )
+				printf("msgsed fail!\n");
+	}
+}
+
+const char cmd[8] = {
+0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37
+};
+/*
+struct msgbuf m485_msg;
+void master485_test()
+{
+	while(1)
+	{
+		memset(m485_msg.mtext,0,sizeof(char)*MAST485_BUF_SIZE);
+		msgrcv(msg_box,&m485_msg,MAST485_BUF_SIZE,0,0);
+		printf("m485_msg:%s!\n",msg_master.mtext[0]);
+	}
+	close(master485_fd);
+}
+*/
+

@@ -1,0 +1,6 @@
+hzd:
+	arm-linux-gnueabihf-gcc hzd_main.c 485communication.c 485communication.h metering.c task_slave485.c -o hzd -lpthread
+
+clean:
+	rm hzd
+
