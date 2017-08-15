@@ -12,5 +12,14 @@ public:
      * 调用方法swap_with_zero来对array进行排序
      */
     void sort(int* array, int len) {
+    	int *p = array,tmp,i = 2;
+    	for(int j = 0; j < len ; j++){
+		    swap_with_zero(p,len,*(p+j));
+	    	for(i = 2+j,tmp = *(p+1+j); i < len; i ++){
+		    	if(tmp > *(p + i))
+		    		tmp = *(p+i);
+		    }
+		    swap_with_zero(p,len,tmp);	
+	    }
     }
 };
