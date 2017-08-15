@@ -1,27 +1,10 @@
-/**
- * 交换数组里n和0的位置
- * array: 存储[0-n)的数组
- * len: 数组长度
- * n: 数组里要和0交换的数
- */
-extern void swap_with_zero(int* array, int len, int n);
+#include <iostream>
 
-class Solution {
-public:
-    /**
-     * 调用方法swap_with_zero来对array进行排序
-     */
-    void sort(int* array, int len) {
-    	int *p = array,tmp;
-    	for(int j = 0,tmp = *p; j < len - 1 ; j++){
-		    swap_with_zero( p,len,*(p+j) );
-	    	for(i = j + 1,tmp = *(p+i); i < len ; i ++){
-		    	if( tmp > *(p + i) )
-		    		tmp = *(p+i);
-		    }
-		    swap_with_zero(p,len,tmp);	
-	    }
-	    for(int i = len - 1;i >=0 ; i --)
-	    	swap_with_zero(p,len,*(p + i));
-    }
-};
+using namespace std;
+
+int main(void){
+	int a,b;
+	while(cin>>a>>b)
+		cout<<a+b<<endl;
+	return 0;
+}
