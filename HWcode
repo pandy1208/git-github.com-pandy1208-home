@@ -1,16 +1,31 @@
 #include <iostream>
 
+
+
 using namespace std;
 
+
+
 int main(void){
+
     long n;
+
     cin>>n;
+
     for(int i = 2; n >= i ; i ++){
+
         while( n % i == 0){
+
             cout<<i<<' ';
+
         	n /= i;
+
         }
+
     }
-    cout<<endl;
+
+    cout<<"haode"<<endl;
+
     return 0;
+
 }
