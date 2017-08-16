@@ -1,70 +1,21 @@
 #include <iostream>
-#include <string>
 
 using namespace std;
 
 int main(void){
-    string in;
-    const char *p = NULL;
-    int size = 0;
-    while(cin>>in){
-    	p = in.c_str();
-    	size = in.size();
-    	while( size-- ){
-	    	if( (*p >= 'A')&&(*p < 'Z') ){
-	    		cout<<char( *p + 33 );
-				p++;
-				continue;	
+    int emp = 0,cnt = 0,tmp = 0;
+    while(cin>>emp){
+    	while(emp > 2){
+	    	tmp = emp / 3;
+			cnt += tmp;
+			emp %= 3;
+			emp += tmp;	
+	    }
+	    if(emp == 2){
+	    	cnt ++;
 	    	}
-			if( *p == 'Z'){
-				cout<<'a';
-				p++;
-				continue;
-			}
-			if( (*p >= 'a')&&(*p <= 'c') ){
-				cout<<2;
-				p++;
-				continue;
-			}
-			if( (*p >= 'd')&&(*p <= 'f') ){
-				cout<<3;
-				p++;
-				continue;
-			}
-			if( (*p >= 'g')&&(*p <= 'i') ){
-				cout<<4;
-				p++;
-				continue;
-			}
-			if( (*p >= 'j')&&(*p <= 'l') ){
-				cout<<5;
-				p++;
-				continue;
-			}
-			if( (*p >= 'm')&&(*p <= 'o') ){
-				cout<<6;
-				p++;
-				continue;
-			}
-			if( (*p >= 'p')&&(*p <= 's') ){
-				cout<<7;
-				p++;
-				continue;
-			}
-			if( (*p >= 't')&&(*p <= 'v') ){
-				cout<<8;
-				p++;
-				continue;
-			}
-			if( (*p >= 'w')&&(*p <= 'z') ){
-				cout<<9;
-				p++;
-				continue;
-			}
-			cout<<*p;
-			p ++;
-	    }  
-	    cout<<endl;
+	    cout<<cnt<<endl;
+	    cnt = 0;
     }
     return 0;
 }
