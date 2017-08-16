@@ -4,31 +4,31 @@
 using namespace std;
 
 int main(void){
-    int arr[26] = {0};
+    int arr[27] = {0};
     int res[20] = {0};
     string in;
     const char *p; 
     while(cin>>in){
     	p = in.c_str();
     	for(int i = 0; i < in.size() ; i ++, p ++)
-	    	arr[*p-97] += 1,res[i] = *p - 97;
+	    	arr[*p-96] += 1,res[i] = *p - 96;
 	    	
     	int min = 100;
     	
-    	for(int i = 0; i < 26; i ++)
+    	for(int i = 1; i < 27; i ++)
     		if( (min > arr[i])&&(arr[i] != 0))
     			min = arr[i];
 		
-		for(int i = 0; i < 26; i ++)
+		for(int i = 1; i < 27; i ++)
 			if( min == arr[i])
 				arr[i] = 0;
 				
 		for(int i =0 ,j = 0 ; j < 20 ; j ++){
 				if(arr[ res[j] ] != 0)
-					cout<<char( res[j] + 97);
+					cout<<char( res[j] + 96);
 		}
 		cout<<endl;
-		for(int i = 0;i<26;i++)
+		for(int i = 1;i<27;i++)
 			arr[i] = 0;
 		for(int i = 0;i<20;i++)
 			res[i] = 0;
