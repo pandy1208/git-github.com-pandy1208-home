@@ -1,21 +1,33 @@
 #include <iostream>
+#include <string>
 
 using namespace std;
 
 int main(void){
-    int emp = 0,cnt = 0,tmp = 0;
-    while(cin>>emp){
-    	while(emp > 2){
-	    	tmp = emp / 3;
-			cnt += tmp;
-			emp %= 3;
-			emp += tmp;	
-	    }
-	    if(emp == 2){
-	    	cnt ++;
-	    	}
-	    cout<<cnt<<endl;
-	    cnt = 0;
+    int arr[26] = {0};
+    int res[20] = {0};
+    string in;
+    const char *p; 
+    while(cin>>in){
+    	p = in.c_str();
+    	for(int i = 0; i < in.size() ; i ++, p ++)
+	    	arr[*p-97] += 1,res[i] = *p - 97;
+	    	
+    	int min = arr[0];
+    	
+    	for(int i = 0; i < 26; i ++)
+    		if( (min > arr[i])&&(arr[i] != 0))
+    			min = arr[i];
+		
+		for(int i = 0; i < 26; i ++)
+			if( min == arr[i])
+				arr[i] = 0;
+				
+		for(int i =0 ,j = 0 ; j < 20 ; j ++){
+				if(arr[ res[j] ] != 0)
+					cout<<char( res[j] + 97);
+		}
+		cout<<endl;
     }
     return 0;
 }
