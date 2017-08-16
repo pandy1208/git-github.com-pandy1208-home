@@ -1,51 +1,18 @@
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
 int main(void){
-    vector<int>vec;
-    int n,key,val,j=0;
+    int a[1000] = {0};
+    int i = 0,n = 0,key,val;
     cin>>n;
     for(int i = 0; i < n; i ++){
         cin>>key>>val;
-        vec.push_back(key);
-        vec.push_back(val);
+        a[key] += val;
     }
-    vector<int>::iterator itr1 = vec.begin();
-    vector<int>::iterator itr2 = vec.begin();
-    
-    itr1 = vec.begin();
-    while( itr1 != vec.end() ){
-        itr2 = itr1;
-        itr2 ++, itr2 ++;
-        while( itr2 != vec.end() ){
-            if( *itr2 == *itr1){
-                val = *(++itr1);
-				val += *(++itr2);
-				
-				*itr1 = val;
-				vec.erase(itr2);
-                vec.erase(++itr1);
-                
-			    itr1 = vec.begin();
-			    j ++;
-			    for(int i = 0; i < 2*j; i ++)
-			    	itr1 ++;
-                itr2 = itr1;
-                itr2 ++,itr2 ++;
-            }
-            else
-            	itr2 ++, itr2 ++;
-        }
-        itr1 ++,itr1 ++;
-    }
-    itr1 = vec.begin();
-    while(itr1 != vec.end() ){
-        cout<<*itr1<<' ';
-        itr1 ++;
-        cout<<*itr1<<endl;;
-        itr1 ++;
+    for(i = 0; i < 1000 ; i ++){
+    	if(a[i] != 0)
+    		cout<<i<<' '<<a[i]<<endl;
     }
     return 0;
 }
